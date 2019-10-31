@@ -15,7 +15,7 @@ git submodule add -b dev --name test git@github.com:forkuser/testSubmodule.git s
 ```txt
 git submodule init
 git submodule sync
-git submodule update --recursive --remote
+git submodule foreach git checkout {branch名字}
 ```
 
 ## 删除submodule
