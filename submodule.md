@@ -10,20 +10,28 @@ git submodule add -b dev --name test git@github.com:forkuser/testSubmodule.git s
 
 ```
 
+## 初始化更新
+
+```txt
+git submodule init
+git submodule sync
+git submodule update --recursive --remote
+```
+
 ## 删除submodule
 
 ```txt
 rm -rf <submodule的path>
 git rm --cached <submodule的path>
 rm -rf .git/modules/<submodule名字>
-
+手动删除.gitmodules下面对应的那段
 ----
 git submodule deinit -f <submodule的path>
 或者
 git config --remove-section submodule.<submodule名字>
 ----
 
-手动删除.gitmodules下面对应的那段
+
 例子:
 rm -rf submodule/testSubmodule
 git rm --cached submodule/testSubmodule
