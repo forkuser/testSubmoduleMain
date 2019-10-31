@@ -12,10 +12,11 @@ git submodule add -b dev --name test git@github.com:forkuser/testSubmodule.git s
 
 ## 初始化更新
 
-```txt
+```js
 git submodule init
 git submodule sync
-git submodule foreach git checkout {branch名字}
+git submodule foreach git checkout dev
+git submodule foreach git pull origin dev
 ```
 
 ## 删除submodule
