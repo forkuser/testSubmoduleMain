@@ -5,3 +5,4 @@
 [submodule "submodule/testSubmodule2"]
 	path = submodule/testSubmodule2
 	url = git@github.com:forkuser/testSubmodule2.git
+	branch = dev
