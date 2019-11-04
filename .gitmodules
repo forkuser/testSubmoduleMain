@@ -2,3 +2,6 @@
 	path = submodule/testSubmodule
 	url = git@github.com:forkuser/testSubmodule.git
 	branch = dev
+[submodule "submodule/testSubmodule2"]
+	path = submodule/testSubmodule2
+	url = git@github.com:forkuser/testSubmodule2.git
