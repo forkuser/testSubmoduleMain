@@ -1,0 +1,6 @@
+{
+	"name": "connect",
+	"scripts": {
+    "git": "node git/gitTest.js"
+  }
+}
