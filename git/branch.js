@@ -1,8 +1,5 @@
-let child_process = require('child_process');
-let { mLog, log } = require('./log.js');
-const options = {
-	cwd: process.cwd()
-};
+let { log } = require('./log.js');
+let shellFn = require('./shell.js');
 
 function getBranchList(str) {
 	let list = str.split('\n');
@@ -16,6 +13,7 @@ function getBranchList(str) {
 	return list;
 }
 
+// 找到当前分支
 function getCurrentBranch(list) {
 	let reg = /^(\*\s*)(.*)/;
 	let curBranch;
@@ -32,39 +30,87 @@ function getCurrentBranch(list) {
 	return curBranch;
 }
 
+// 获取分支名称
+function getBranchName(branch) {
+	let reg = /^(\*\s*)(.*)/;
+	branch = branch.trim();
+	branch = branch.replace(reg, function (a, b, c) {
+		return c;
+	});
+	return branch;
+}
+
+// 获取到分支列表
+function getLocalBranch() {
+	let shellCommand = 'git branch';
+	return shellFn(shellCommand).then(({ stdout, stderr }) => {
+		return getBranchList(stdout);
+	});
+}
+
+
+
+// 分支是否存在
 async function isBranchExist(branch) {
-	let curBranch = await getLocalBranch();
-	if (branch === curBranch) {
+	let branchList = await getLocalBranch();
+	for (let i = 0; i < branchList.length; i++) {
+		let curBranch = getBranchName(branchList[i]);
+		if (branch === curBranch) {
+			return true;
+		}
+	}
+	return false;
+}
+
+// 是否是当前分支
+async function isCurrentBranch(branch) {
+	let branchList = await getLocalBranch();
+	let currentBranch = await getCurrentBranch(branchList);
+	if (branch === currentBranch) {
 		return true;
 	}
 	return false;
 }
 
-
-
-function getLocalBranch() {
-	let shellCommand = 'git branch';
-	log(shellCommand);
-	return new Promise((reslove, reject) => {
-		child_process.exec(shellCommand, options, function (error, stdout, stderr) {
-			mLog(error, stdout, stderr);
-			if (error) {
-				reject(error);
-				return;
-			}
-			if (stdout) {
-				let branchList = getBranchList(stdout);
-				let branch = getCurrentBranch(branchList);
-				reslove(branch);
-			}
-		});
-	});
+function createBranch(branch, renoteBranch) {
+	let shellCommand = `git branch ${branch} ${renoteBranch || ''}`;
+	return shellFn(shellCommand);
 }
 
-function branchs() {
-	isBranchExist();
+// 切换分支
+function checkoutBranch(branch) {
+	let shellCommand = `git checkout ${branch}`;
+	return shellFn(shellCommand);
 }
+
+function gitPull(renoteBranch) {
+	let origin = '';
+	let branch = '';
+	if (renoteBranch) {
+		let list = renoteBranch.split('/');
+		origin = list[0];
+		branch = list[1];
+	}
+	let shellCommand = `git pull ${origin} ${branch}`;
+	return shellFn(shellCommand);
+}
+
+async function checkoutToBranch(branch, renoteBranch) {
+	let isCurrent = await isCurrentBranch(branch);
+	if (!isCurrent) {
+		let isExist = await isBranchExist(branch);
+		if (!isExist) {
+			await createBranch(branch, renoteBranch);
+		}
+		await checkoutBranch(branch);
+	}
+	await gitPull(renoteBranch);
+}
+
 
 module.exports = function (connect) {
-	connect.addHandle(branchs);
+	connect.addHandle(async function (connect) {
+		await checkoutToBranch('dev', 'origin/master');
+		connect();
+	});
 }
