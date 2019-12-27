@@ -1,7 +1,7 @@
 const handleList = [];
 const addHandle = function (fn) {
 	handleList.push(fn);
-}
+};
 
 
 const start = function () {
@@ -12,9 +12,9 @@ const start = function () {
 			i++;
 			fn(next);
 		}
-	}
+	};
 	next();
-}
+};
 module.exports = {
 	start,
 	addHandle
